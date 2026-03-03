@@ -1,4 +1,4 @@
-# φ-Equation Investigation: Gradient-Modulated Reaction-Diffusion Dynamics
+# Kurtonian φ-Equation Investigation: Gradient-Modulated Reaction-Diffusion Dynamics
 
 **A comprehensive mathematical and computational investigation of a novel non-linear field equation with potential foundational implications for physics, biology, and pattern formation.**
 
