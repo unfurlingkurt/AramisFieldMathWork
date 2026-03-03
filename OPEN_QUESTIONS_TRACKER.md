@@ -197,19 +197,49 @@ dM/dt = ∫ [-αγ|∇φ|² + β·tanh(φ)·e^(-|∇φ|)] dV ≠ 0
 ### 1.3 Traveling Waves
 
 #### Q1.3.1: Wave Solutions Existence
-**Status**: OPEN  
+**Status**: IN PROGRESS  
 **Question**: Do traveling wave solutions exist? What are their speeds and profiles?  
-**Investigation Needed**: 
-- Moving frame transformation
-- Solve for wave profiles
-- Measure wave speed vs parameters
 
-**Related Tasks**: Task 8.1
+**Partial Answer**: Exact traveling wave solutions are difficult to find. Optimization approach failed to converge (residual = 0.72, success = False).
+
+**Key Findings**:
+- Moving frame equation: -c dφ/dξ = α d²φ/dξ² - αγ|dφ/dξ|² + β·tanh(φ)·e^(-|dφ/dξ|)
+- Gradient-dependent terms (e^(-|∇φ|) and γ|∇φ|²) prevent standard traveling wave structure
+- Approximate wave-like solutions propagate but don't maintain constant speed/shape
+- Speed mismatch: predicted c = -0.042, measured c = -0.789 (1763% error)
+
+**Interpretation**: The equation may NOT support simple traveling wave solutions due to:
+1. Spatially-varying effective diffusion (from γ|∇φ|² term)
+2. Gradient-dependent reaction (from e^(-|∇φ|) term)
+3. Coupling between wave speed and gradient magnitude
+
+**Alternative Solutions Possible**:
+- Breathing pulses (oscillating localized structures)
+- Wandering pulses (moving but shape-changing)
+- Dissipative solitons (stable but non-traveling)
+- Topological waves (defined by topological invariants)
+
+**Temporal Structure**: Single-scale dynamics (fast gear only, power = 271.57) - unlike complex field evolution which shows multi-scale structure.
+
+**Open Sub-Questions**:
+- Do exact traveling waves exist in special parameter regimes?
+- Do topological traveling waves exist?
+- What about wave trains or modulated waves?
+
+**Evidence**: 
+- `traveling_wave_simple.py` - Analysis code
+- `traveling_wave_profile.png` - Wave profile visualization
+- `wave_propagation_analysis.png` - Spatiotemporal evolution
+- `08_traveling_wave_report.md` - Complete analysis
+
+**Investigated**: 2026-03-03  
+**Related Tasks**: Task 8.1 (PARTIALLY COMPLETE)
 
 #### Q1.3.2: Soliton Behavior
 **Status**: OPEN  
 **Question**: Do waves interact like solitons (pass through each other)?  
 **Investigation Needed**: Simulate colliding waves  
+**Note**: Since exact traveling waves not found, this question may need reformulation  
 **Related Tasks**: Task 8.2
 
 ### 1.4 Global Behavior
