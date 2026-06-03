@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aramis-filament"
+version = "0.1.0"
+description = "Test whether cosmic filament emission aligns with a native RatioSpace (Farey) medoid rather than a Euclidean midpoint."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Aramis Field Math Work" }]
+# Stage 0 (native geometry + planted-signal demo) needs ONLY numpy.
+dependencies = ["numpy>=1.24"]
+
+[project.optional-dependencies]
+# Real catalog ingestion (Stage 1): cosmology + table handling.
+data = ["astropy>=5.3", "pandas>=2.0", "scipy>=1.10"]
+# Sky-map sampling (Stage 2): HEALPix + survey access.
+maps = ["healpy>=1.16", "astroquery>=0.4.6"]
+# Plots and reports.
+viz = ["matplotlib>=3.7"]
+# Everything, for full local development.
+dev = [
+    "pytest>=7.4",
+    "astropy>=5.3", "pandas>=2.0", "scipy>=1.10",
+    "healpy>=1.16", "astroquery>=0.4.6", "matplotlib>=3.7",
+]
+
+[project.scripts]
+aramis = "aramis.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
