@@ -8,6 +8,7 @@ to the observed samples — a medoid, not a centroid.
 
 from __future__ import annotations
 
+from functools import lru_cache
 from typing import Iterable, List, Optional, Sequence, Tuple
 
 from .metric import DEFAULT_METRIC, RatioMetric
@@ -38,6 +39,12 @@ def corridor_candidates(a: Ratio, b: Ratio, depth: int = 8) -> List[Ratio]:
     return out
 
 
+@lru_cache(maxsize=None)
+def _axis_corridor_cached(depth: int) -> Tuple[Ratio, ...]:
+    full = corridor_candidates(Ratio(0, 1), Ratio(1, 0), depth=depth)
+    return tuple(full[1:-1])
+
+
 def axis_corridor(depth: int = 8) -> List[Ratio]:
     """The native axis corridor: Stern-Brocot rationals spanning a filament axis.
 
@@ -45,10 +52,10 @@ def axis_corridor(depth: int = 8) -> List[Ratio]:
     ``p:q`` sits at axis fraction ``p/(p+q)``; depth-2 already yields the 1/3, 1/2,
     2/3 thirds structure noted in ``RATIOSPACE_FINDINGS_SUMMARY.md``. The two seed
     endpoints (axis fractions 0 and 1, the filament tips) are excluded — a central
-    object lives strictly between them.
+    object lives strictly between them. Cached, since the axis corridor depends only
+    on ``depth`` and is queried once per measurement.
     """
-    full = corridor_candidates(Ratio(0, 1), Ratio(1, 0), depth=depth)
-    return full[1:-1]
+    return list(_axis_corridor_cached(depth))
 
 
 def farey_medoid(

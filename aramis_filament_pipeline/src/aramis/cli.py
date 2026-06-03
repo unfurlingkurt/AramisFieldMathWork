@@ -8,7 +8,7 @@ import sys
 from typing import List, Optional
 
 from .geometry.metric import tension_additive, tension_multiplicative
-from .pipeline.stages import stage0_puremath
+from .pipeline.stages import stage0_puremath, stage3_battery
 
 _METRICS = {
     "additive": tension_additive,
@@ -31,6 +31,16 @@ def build_parser() -> argparse.ArgumentParser:
         "--metric", choices=list(_METRICS), default="additive",
         help="Native tension metric.",
     )
+
+    p3 = sub.add_parser("stage3", help="Null/control battery with significance.")
+    p3.add_argument("--out", default="outputs/stage3", help="Output directory.")
+    p3.add_argument("--n", type=int, default=80, help="Number of synthetic filaments.")
+    p3.add_argument("--seed", type=int, default=0, help="RNG seed.")
+    p3.add_argument("--n-null", type=int, default=50, help="Null resamples per test.")
+    p3.add_argument(
+        "--metric", choices=list(_METRICS), default="additive",
+        help="Native tension metric.",
+    )
     return parser
 
 
@@ -42,6 +52,14 @@ def main(argv: Optional[List[str]] = None) -> int:
         )
         print(json.dumps(result["summary"], indent=2))
         print(f"\nWrote {result['csv']}")
+        return 0
+    if args.stage == "stage3":
+        result = stage3_battery(
+            out_dir=args.out, n=args.n, seed=args.seed,
+            n_null=args.n_null, metric=_METRICS[args.metric],
+        )
+        print(json.dumps(result["result"], indent=2))
+        print(f"\nWrote {result['json']}")
         return 0
     return 1
 

@@ -21,7 +21,7 @@ class FareyMedoid:
 
     name = "farey_medoid"
 
-    def __init__(self, depth: int = 7, sample_denom: int = 1000) -> None:
+    def __init__(self, depth: int = 6, sample_denom: int = 1000) -> None:
         self.depth = depth
         self.sample_denom = sample_denom
 

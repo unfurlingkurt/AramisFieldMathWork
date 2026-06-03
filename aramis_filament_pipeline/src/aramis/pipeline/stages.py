@@ -88,3 +88,47 @@ def stage0_puremath(
     }
     out_path = write_csv(Path(out_dir) / "medoid_vs_centroid.csv", rows, metadata)
     return {"rows": rows, "summary": summary, "csv": str(out_path)}
+
+
+def stage3_battery(
+    out_dir: str | Path = "outputs/stage3",
+    n: int = 120,
+    seed: int = 0,
+    n_null: int = 200,
+    spec: ScaleSpec = DEFAULT_MASS_SCALE,
+    metric: RatioMetric = DEFAULT_METRIC,
+    filaments: Optional[Sequence[Filament]] = None,
+    observed=None,
+) -> Dict[str, object]:
+    """Full null/control battery: Farey medoid vs Euclidean midpoint with significance.
+
+    Defaults to synthetic data with the planted center as ground truth; pass real
+    ``filaments`` and an ``observed`` emission-center function for Stage-2 catalogs.
+    """
+    import json
+
+    from ..stats.nulls import observed_center_planted, run_null_battery
+    from ..systems import EuclideanMidpoint, FareyMedoid
+
+    if filaments is None:
+        filaments = make_synthetic(n=n, seed=seed)
+    if observed is None:
+        observed = observed_center_planted
+
+    result = run_null_battery(
+        filaments,
+        medoid_system=FareyMedoid(),
+        baseline_system=EuclideanMidpoint(),
+        observed=observed,
+        spec=spec,
+        metric=metric,
+        n_null=n_null,
+        seed=seed,
+    )
+    out = Path(out_dir)
+    out.mkdir(parents=True, exist_ok=True)
+    report = {"stage": "3_battery", "seed": seed, "metric": metric.__name__,
+              **spec.to_metadata(), "result": result}
+    json_path = out / "null_battery.json"
+    json_path.write_text(json.dumps(report, indent=2))
+    return {"result": result, "json": str(json_path)}
