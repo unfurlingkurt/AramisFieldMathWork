@@ -41,7 +41,7 @@ def build_parser() -> argparse.ArgumentParser:
     p1.add_argument("catalog", help="Path to an endpoint-pair table (CSV or FITS).")
     p1.add_argument("--out", default="outputs/stage1", help="Output directory.")
     p1.add_argument(
-        "--loader", choices=["tempel", "lrg", "csv"], default="tempel",
+        "--loader", choices=["dr8", "tempel", "lrg", "csv"], default="dr8",
         help="Catalog loader / column mapping.",
     )
     p1.add_argument(
@@ -53,7 +53,7 @@ def build_parser() -> argparse.ArgumentParser:
     p2.add_argument("catalog", help="Path to an endpoint-pair table (CSV or FITS).")
     p2.add_argument("map", help="Path to a HEALPix map (FITS).")
     p2.add_argument("--out", default="outputs/stage2", help="Output directory.")
-    p2.add_argument("--loader", choices=["tempel", "lrg", "csv"], default="tempel")
+    p2.add_argument("--loader", choices=["dr8", "tempel", "lrg", "csv"], default="dr8")
     p2.add_argument("--n-samples", type=int, default=32, help="Samples along axis.")
     p2.add_argument("--radius-arcmin", type=float, default=30.0, help="Disc radius.")
     p2.add_argument("--metric", choices=list(_METRICS), default="additive")

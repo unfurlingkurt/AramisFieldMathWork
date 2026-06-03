@@ -104,7 +104,10 @@ def stage1_catalog(
     discrete Farey medoid differs from the continuous force-balance point and the
     Euclidean midpoint. ``loader`` is one of ``tempel`` | ``lrg`` | ``csv``.
     """
-    if loader == "tempel":
+    if loader == "dr8":
+        from ..data.loaders.tempel_bisous import load_dr8_fits
+        filaments = load_dr8_fits(catalog_path)
+    elif loader == "tempel":
         from ..data.loaders.tempel_bisous import load_filaments
         filaments = load_filaments(catalog_path)
     elif loader == "lrg":
@@ -171,7 +174,10 @@ def stage2_maps(
     is the first stage where the Farey medoid is fit to *observed emission* rather
     than mass alone.
     """
-    if loader == "tempel":
+    if loader == "dr8":
+        from ..data.loaders.tempel_bisous import load_dr8_fits
+        filaments = load_dr8_fits(catalog_path)
+    elif loader == "tempel":
         from ..data.loaders.tempel_bisous import load_filaments
         filaments = load_filaments(catalog_path)
     elif loader == "lrg":

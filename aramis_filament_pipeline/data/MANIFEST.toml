@@ -16,16 +16,18 @@ stage = 1
 description = "Tempel et al. (2014) SDSS Bisous cosmic-web filament catalogue (15,421 filaments)."
 reference = "Tempel et al. 2014, MNRAS 438, 3465"
 vizier = "J/MNRAS/438/3465"
-url = "http://www.aai.ee/~elmo/sdss-filaments/"
+url = "http://www.aai.ee/~elmo/sdss-filaments/dr8_filaments.fits"
+landing = "http://www.aai.ee/~elmo/sdss-filaments/"
 cosmology = "H0=100h, Omega_m=0.27, Omega_Lambda=0.73"
 license = "Public (VizieR/CDS terms)"
-sha256 = ""  # fill after first verified download
+sha256 = "409d0063716eb2cab3a9100c314e47db5c2eef810749d3a7c9134fde64f93b64"
 reduction = """
-The published tables give filament spine points and member galaxies. Reduce to an
-endpoint-pair table with columns: fil_id, ra_start, dec_start, z_start, mass_start,
-ra_end, dec_end, z_end, mass_end. Endpoints = extreme spine points; mass proxy =
-summed member-galaxy luminosity (or group mass) near each end. See
-src/aramis/data/loaders/tempel_bisous.py for the expected columns.
+Load dr8_filaments.fits DIRECTLY with loader='dr8' (load_dr8_fits) — no manual
+reduction needed. Each row gives a comoving bounding box (xmin..zlen, Mpc/h) and
+endpoint proxies lum1/lum2 (luminosity) and ngal1/ngal2 (galaxy counts). Endpoints
+are taken as the two extreme box corners; sky coords use FlatLambdaCDM(H0=100,
+Om0=0.27). NOTE: ~32% of filaments have lum1==lum2 exactly (a catalogue discreteness
+that piles up at balance-fraction 0.5); account for it in any Farey-clustering test.
 """
 
 [[source]]

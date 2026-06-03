@@ -15,3 +15,6 @@ data/*
 *.fits
 *.fits.gz
 *.hpx
+
+# ...except tiny hand-made test fixtures (NOT real data), which must be committed.
+!tests/data/fixtures/*.fits

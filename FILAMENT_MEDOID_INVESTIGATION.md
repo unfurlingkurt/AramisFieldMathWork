@@ -1,7 +1,8 @@
 # Cosmic Filament Medoid Investigation
 
 **Date**: 2026-06-03
-**Status**: INSTRUMENT BUILT — Stages 0–3 runnable; awaiting real-catalog + map runs
+**Status**: INSTRUMENT BUILT + first real-catalog run (Stage 1, 15,421 Tempel filaments).
+First result is a clean **negative** on the mass-only test; emission test (Stage 2) is next.
 **Code**: [`aramis_filament_pipeline/`](aramis_filament_pipeline/)
 
 ---
@@ -91,6 +92,25 @@ control (scrambling the emission axis) erases the advantage (p ≈ 0.02), confir
 signal lives in the emission geometry. These numbers validate the *instrument*; they
 are not evidence about real filaments. The real test runs Stages 1–2 on Tempel/Bisous
 filaments and ROSAT/GLEAM/Planck-y maps (see `data/MANIFEST.toml`).
+
+### Real-data run — Stage 1 (Tempel/Bisous, N = 15,421)
+
+The published `dr8_filaments.fits` loads directly (`loader='dr8'`): each filament gives
+comoving endpoints (bounding-box corners) and endpoint luminosities `lum1/lum2` as the
+mass proxy. Stage 1 ran on all 15,421 filaments; for **59%** the discrete Farey medoid
+places the center off the Euclidean midpoint (driven by real luminosity asymmetry).
+
+**First result is a careful negative.** We asked whether the real luminosity-balance
+fractions `lum2/(lum1+lum2)` cluster at low-depth Farey nodes vs a matched smooth null.
+A naive test gives a striking `z = −18`, but it is an **artifact**: ~**32%** of
+filaments have `lum1 == lum2` *exactly*, piling up at fraction 0.5 — which is itself the
+lowest Farey node. Excluding that spike, the signal collapses to `z = −1.73` (not
+significant). Reproduce with `python scripts/analyze_stage1_farey.py`.
+
+**Takeaway:** the mass-only (luminosity-ratio) test does **not** support the medoid
+hypothesis. This is informative — it rules out a spurious mass signal and says the
+hypothesis, if true, lives in **emission geometry**, motivating Stage 2 on real maps
+(with proper stacking and background subtraction, a sub-project in its own right).
 
 ## Key design finding (drives the next step)
 
