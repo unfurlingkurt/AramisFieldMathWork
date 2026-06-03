@@ -1,0 +1,17 @@
+# Build / cache
+__pycache__/
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+
+# Run artifacts
+outputs/
+
+# Real data is never committed — reproduce it via scripts/download_data.py + MANIFEST.toml
+data/*
+!data/.gitkeep
+!data/MANIFEST.toml
+*.fits
+*.fits.gz
+*.hpx

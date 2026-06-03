@@ -1,0 +1,50 @@
+"""Command-line entry point: ``aramis <stage> [options]``."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import sys
+from typing import List, Optional
+
+from .geometry.metric import tension_additive, tension_multiplicative
+from .pipeline.stages import stage0_puremath
+
+_METRICS = {
+    "additive": tension_additive,
+    "multiplicative": tension_multiplicative,
+}
+
+
+def build_parser() -> argparse.ArgumentParser:
+    parser = argparse.ArgumentParser(
+        prog="aramis",
+        description="Aramis filament medoid pipeline (RatioSpace geometry).",
+    )
+    sub = parser.add_subparsers(dest="stage", required=True)
+
+    p0 = sub.add_parser("stage0", help="Zero-data planted-signal recovery demo.")
+    p0.add_argument("--out", default="outputs/stage0", help="Output directory.")
+    p0.add_argument("--n", type=int, default=60, help="Number of synthetic filaments.")
+    p0.add_argument("--seed", type=int, default=0, help="RNG seed.")
+    p0.add_argument(
+        "--metric", choices=list(_METRICS), default="additive",
+        help="Native tension metric.",
+    )
+    return parser
+
+
+def main(argv: Optional[List[str]] = None) -> int:
+    args = build_parser().parse_args(argv)
+    if args.stage == "stage0":
+        result = stage0_puremath(
+            out_dir=args.out, n=args.n, seed=args.seed, metric=_METRICS[args.metric]
+        )
+        print(json.dumps(result["summary"], indent=2))
+        print(f"\nWrote {result['csv']}")
+        return 0
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())
