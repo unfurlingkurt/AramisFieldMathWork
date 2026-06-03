@@ -90,6 +90,46 @@ def stage0_puremath(
     return {"rows": rows, "summary": summary, "csv": str(out_path)}
 
 
+def stage1_catalog(
+    catalog_path: str | Path,
+    out_dir: str | Path = "outputs/stage1",
+    loader: str = "tempel",
+    spec: ScaleSpec = DEFAULT_MASS_SCALE,
+    metric: RatioMetric = DEFAULT_METRIC,
+) -> Dict[str, object]:
+    """Real catalog geometry: load endpoint pairs and run the three systems.
+
+    No emission samples yet (that is Stage 2), so this is descriptive: it reports,
+    per filament, where each measurement system places the center, and how the
+    discrete Farey medoid differs from the continuous force-balance point and the
+    Euclidean midpoint. ``loader`` is one of ``tempel`` | ``lrg`` | ``csv``.
+    """
+    if loader == "tempel":
+        from ..data.loaders.tempel_bisous import load_filaments
+        filaments = load_filaments(catalog_path)
+    elif loader == "lrg":
+        from ..data.loaders.sdss_lrg_pairs import load_pairs
+        filaments = load_pairs(catalog_path)
+    else:
+        from ..data.loaders.tabular import load_pairs_csv
+        filaments = load_pairs_csv(catalog_path)
+
+    systems = default_systems()
+    rows = evaluate_filaments(filaments, systems=systems, spec=spec, metric=metric)
+    # How often does the discrete medoid disagree with the continuous midpoint?
+    n_diff_mid = sum(1 for r in rows if abs(r["farey_medoid_t"] - 0.5) > 1e-6)
+    summary = {
+        "n_filaments": len(rows),
+        "loader": loader,
+        "medoid_differs_from_midpoint_frac": (n_diff_mid / len(rows)) if rows else None,
+    }
+    metadata = {"stage": "1_catalog", "metric": metric.__name__,
+                "catalog": str(catalog_path), **spec.to_metadata(),
+                **{f"summary_{k}": v for k, v in summary.items()}}
+    out_path = write_csv(Path(out_dir) / "catalog_systems.csv", rows, metadata)
+    return {"rows": rows, "summary": summary, "csv": str(out_path)}
+
+
 def stage3_battery(
     out_dir: str | Path = "outputs/stage3",
     n: int = 120,

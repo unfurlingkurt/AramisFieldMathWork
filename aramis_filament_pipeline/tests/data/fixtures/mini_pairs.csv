@@ -1,0 +1,5 @@
+# Tiny hand-written fixture (NOT real data) for offline loader tests.
+id,ra1,dec1,z1,mass1_proxy,ra2,dec2,z2,mass2_proxy
+p1,10.0,5.0,0.20,1.0,12.0,5.5,0.20,1.0
+p2,20.0,2.0,0.30,2.0,23.0,2.2,0.30,1.0
+p3,40.0,-4.0,0.40,8.0,44.0,-3.8,0.40,1.0

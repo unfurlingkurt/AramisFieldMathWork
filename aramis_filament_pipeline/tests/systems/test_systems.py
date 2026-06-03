@@ -59,4 +59,6 @@ def test_farey_medoid_fallback_without_samples():
         ep2=Endpoint("b", 1, 0, 0.1, 3.0),
     )
     located = FareyMedoid().locate(fil)
-    assert located.extra.get("fallback") == "no_samples"
+    assert located.extra.get("fallback") == "mass_snap"
+    # Snapped to a Farey node, so it is a clean rational fraction, not the raw COM.
+    assert 0.0 < located.t < 1.0

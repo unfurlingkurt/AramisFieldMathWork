@@ -31,17 +31,25 @@ class FareyMedoid:
         spec: ScaleSpec = DEFAULT_MASS_SCALE,
         metric: RatioMetric = DEFAULT_METRIC,
     ) -> LocatedObject:
+        candidates = axis_corridor(depth=self.depth)
+
         if not filament.samples:
-            # Without emission samples, fall back to the mass-balance fraction.
+            # No emission samples (Stage 1, catalog geometry only): make the native
+            # *mass* prediction — snap the center-of-mass fraction to the nearest
+            # Farey node. This is the discrete analogue of the force-balance point
+            # and is a genuinely distinct, testable prediction.
             m1, m2 = filament.mass1, filament.mass2
             total = m1 + m2
-            t = 0.5 if total <= 0 else m2 / total
-            return LocatedObject(
-                system_name=self.name, t=float(t), score=0.0,
-                extra={"fallback": "no_samples"},
+            t_com = 0.5 if total <= 0 else m2 / total
+            snapped = min(
+                candidates,
+                key=lambda r: (abs(r.axis_fraction() - t_com), r.cf_length()),
             )
-
-        candidates = axis_corridor(depth=self.depth)
+            return LocatedObject(
+                system_name=self.name, t=snapped.axis_fraction(), score=0.0,
+                extra={"fallback": "mass_snap", "medoid_ratio": str(snapped),
+                       "com_fraction": round(t_com, 6)},
+            )
         sample_ratios = [
             fraction_to_ratio(s.s, denom=self.sample_denom) for s in filament.samples
         ]

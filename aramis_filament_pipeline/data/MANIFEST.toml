@@ -1,0 +1,70 @@
+# Data source manifest for the Aramis filament medoid pipeline.
+#
+# Raw catalogs and sky maps are NEVER committed to git (see .gitignore). This file
+# records exactly where each dataset comes from, how to obtain it, and a checksum to
+# verify it — so any future session reproduces the same data. Run:
+#
+#     python scripts/download_data.py --source <name>
+#
+# then verify with the recorded sha256. Large maps (HEALPix) are downloaded only when
+# Stage 2 is run.
+
+[[source]]
+name = "tempel_bisous"
+kind = "filament_catalog"
+stage = 1
+description = "Tempel et al. (2014) SDSS Bisous cosmic-web filament catalogue (15,421 filaments)."
+reference = "Tempel et al. 2014, MNRAS 438, 3465"
+vizier = "J/MNRAS/438/3465"
+url = "http://www.aai.ee/~elmo/sdss-filaments/"
+cosmology = "H0=100h, Omega_m=0.27, Omega_Lambda=0.73"
+license = "Public (VizieR/CDS terms)"
+sha256 = ""  # fill after first verified download
+reduction = """
+The published tables give filament spine points and member galaxies. Reduce to an
+endpoint-pair table with columns: fil_id, ra_start, dec_start, z_start, mass_start,
+ra_end, dec_end, z_end, mass_end. Endpoints = extreme spine points; mass proxy =
+summed member-galaxy luminosity (or group mass) near each end. See
+src/aramis/data/loaders/tempel_bisous.py for the expected columns.
+"""
+
+[[source]]
+name = "sdss_lrg"
+kind = "galaxy_catalog"
+stage = 1
+description = "SDSS Luminous Red Galaxies for endpoint-pair reconstruction (Vernstrom-style)."
+url = "https://dr17.sdss.org/"
+license = "Public (SDSS DR17 terms)"
+sha256 = ""
+reduction = """
+Select LRGs, form pairs with a comoving separation cut (~6-15 Mpc) and a small
+redshift-difference cut. Output columns: pair_id, ra_1, dec_1, z_1, lum_1, ra_2,
+dec_2, z_2, lum_2. See src/aramis/data/loaders/sdss_lrg_pairs.py.
+"""
+
+[[source]]
+name = "rosat_rass"
+kind = "healpix_map"
+stage = 2
+description = "ROSAT All-Sky Survey X-ray map (hot baryon / X-ray filament layer)."
+url = "https://cade.irap.omp.eu/dokuwiki/doku.php?id=rosat"
+license = "Public (CADE/IRAP terms)"
+sha256 = ""
+
+[[source]]
+name = "gleam"
+kind = "healpix_map"
+stage = 2
+description = "GLEAM/MWA low-frequency radio survey (synchrotron / magnetic-field layer)."
+url = "https://cade.irap.omp.eu/dokuwiki/doku.php?id=gleam"
+license = "Public (CADE/IRAP terms)"
+sha256 = ""
+
+[[source]]
+name = "planck_y"
+kind = "healpix_map"
+stage = 2
+description = "Planck Compton-y (SZ) map (thermal pressure layer)."
+url = "https://pla.esac.esa.int/"
+license = "Public (Planck Legacy Archive terms)"
+sha256 = ""
