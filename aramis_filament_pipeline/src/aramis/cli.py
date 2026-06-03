@@ -8,7 +8,12 @@ import sys
 from typing import List, Optional
 
 from .geometry.metric import tension_additive, tension_multiplicative
-from .pipeline.stages import stage0_puremath, stage1_catalog, stage3_battery
+from .pipeline.stages import (
+    stage0_puremath,
+    stage1_catalog,
+    stage2_maps,
+    stage3_battery,
+)
 
 _METRICS = {
     "additive": tension_additive,
@@ -44,6 +49,15 @@ def build_parser() -> argparse.ArgumentParser:
         help="Native tension metric.",
     )
 
+    p2 = sub.add_parser("stage2", help="Sample a HEALPix emission map along axes.")
+    p2.add_argument("catalog", help="Path to an endpoint-pair table (CSV or FITS).")
+    p2.add_argument("map", help="Path to a HEALPix map (FITS).")
+    p2.add_argument("--out", default="outputs/stage2", help="Output directory.")
+    p2.add_argument("--loader", choices=["tempel", "lrg", "csv"], default="tempel")
+    p2.add_argument("--n-samples", type=int, default=32, help="Samples along axis.")
+    p2.add_argument("--radius-arcmin", type=float, default=30.0, help="Disc radius.")
+    p2.add_argument("--metric", choices=list(_METRICS), default="additive")
+
     p3 = sub.add_parser("stage3", help="Null/control battery with significance.")
     p3.add_argument("--out", default="outputs/stage3", help="Output directory.")
     p3.add_argument("--n", type=int, default=80, help="Number of synthetic filaments.")
@@ -69,6 +83,15 @@ def main(argv: Optional[List[str]] = None) -> int:
         result = stage1_catalog(
             catalog_path=args.catalog, out_dir=args.out,
             loader=args.loader, metric=_METRICS[args.metric],
+        )
+        print(json.dumps(result["summary"], indent=2))
+        print(f"\nWrote {result['csv']}")
+        return 0
+    if args.stage == "stage2":
+        result = stage2_maps(
+            catalog_path=args.catalog, map_path=args.map, out_dir=args.out,
+            loader=args.loader, n_samples=args.n_samples,
+            radius_arcmin=args.radius_arcmin, metric=_METRICS[args.metric],
         )
         print(json.dumps(result["summary"], indent=2))
         print(f"\nWrote {result['csv']}")

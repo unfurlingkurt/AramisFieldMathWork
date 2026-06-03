@@ -130,6 +130,85 @@ def stage1_catalog(
     return {"rows": rows, "summary": summary, "csv": str(out_path)}
 
 
+def attach_emission_samples(
+    filaments: Sequence[Filament],
+    map_array,
+    n_samples: int = 32,
+    radius_arcmin: float | None = 30.0,
+) -> List[Filament]:
+    """Sample a HEALPix map along each filament axis and attach cleaned emission.
+
+    Requires the ``[data]`` (great-circle sampling) and ``[maps]`` (healpy) extras.
+    """
+    from dataclasses import replace
+
+    from ..data.cosmology import sky_samples_along_axis
+    from ..maps.healpix_sampling import sample_along_sky
+    from ..maps.profiles import clean_profile, has_signal
+
+    out: List[Filament] = []
+    for f in filaments:
+        pts = sky_samples_along_axis(f.ep1.ra, f.ep1.dec, f.ep2.ra, f.ep2.dec, n_samples)
+        raw = sample_along_sky(map_array, pts, radius_arcmin=radius_arcmin)
+        clean = clean_profile(raw)
+        out.append(replace(f, samples=clean) if has_signal(clean) else f)
+    return out
+
+
+def stage2_maps(
+    catalog_path: str | Path,
+    map_path: str | Path,
+    out_dir: str | Path = "outputs/stage2",
+    loader: str = "tempel",
+    n_samples: int = 32,
+    radius_arcmin: float | None = 30.0,
+    spec: ScaleSpec = DEFAULT_MASS_SCALE,
+    metric: RatioMetric = DEFAULT_METRIC,
+) -> Dict[str, object]:
+    """Sample a real emission map along filament axes and locate centers from it.
+
+    Compares, per filament, the emission peak against each measurement system. This
+    is the first stage where the Farey medoid is fit to *observed emission* rather
+    than mass alone.
+    """
+    if loader == "tempel":
+        from ..data.loaders.tempel_bisous import load_filaments
+        filaments = load_filaments(catalog_path)
+    elif loader == "lrg":
+        from ..data.loaders.sdss_lrg_pairs import load_pairs
+        filaments = load_pairs(catalog_path)
+    else:
+        from ..data.loaders.tabular import load_pairs_csv
+        filaments = load_pairs_csv(catalog_path)
+
+    from ..maps.healpix_sampling import load_healpix_map
+    from ..stats.nulls import observed_center_emission
+
+    map_array, nside = load_healpix_map(map_path)
+    filaments = attach_emission_samples(filaments, map_array, n_samples, radius_arcmin)
+
+    systems = default_systems()
+    rows: List[Dict[str, object]] = []
+    for f in filaments:
+        emission = observed_center_emission(f)
+        row: Dict[str, object] = {"id": f.id, "mass1": f.mass1, "mass2": f.mass2,
+                                  "emission_center": round(emission, 6)}
+        for sysm in systems:
+            loc = sysm.locate(f, spec=spec, metric=metric)
+            row[f"{sysm.name}_t"] = round(loc.t, 6)
+            row[f"{sysm.name}_err"] = round(abs(loc.t - emission), 6)
+        rows.append(row)
+
+    summary = summarize(rows, [s.name for s in systems])
+    metadata = {"stage": "2_maps", "metric": metric.__name__, "nside": nside,
+                "catalog": str(catalog_path), "map": str(map_path),
+                "n_samples": n_samples, "radius_arcmin": radius_arcmin,
+                **spec.to_metadata(),
+                **{f"summary_{k}": v for k, v in summary.items()}}
+    out_path = write_csv(Path(out_dir) / "map_systems.csv", rows, metadata)
+    return {"rows": rows, "summary": summary, "csv": str(out_path)}
+
+
 def stage3_battery(
     out_dir: str | Path = "outputs/stage3",
     n: int = 120,
