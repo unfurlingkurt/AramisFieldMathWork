@@ -53,6 +53,16 @@ def test_shuffle_preserves_multiset():
     assert sorted(out) == sorted(vals)
 
 
+def test_farey_determinant_and_neighbors():
+    from aramis.geometry.ratio import Ratio
+    from aramis.web.farey_adjacency import are_farey_neighbors, farey_determinant
+    # 1/2 and 1/3 are Farey neighbors: |1*3 - 1*2| = 1
+    assert farey_determinant(Ratio(1, 2), Ratio(1, 3)) == 1
+    assert are_farey_neighbors(Ratio(1, 2), Ratio(1, 3))
+    # 1/2 and 1/4 are not: |1*4 - 1*2| = 2
+    assert not are_farey_neighbors(Ratio(1, 2), Ratio(1, 4))
+
+
 def test_web_layer_contains_no_linear_operations():
     """Guard: the web/ layer must never call Euclidean/Gaussian/mean machinery.
 

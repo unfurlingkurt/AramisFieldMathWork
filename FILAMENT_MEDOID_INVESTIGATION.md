@@ -1,9 +1,37 @@
 # Cosmic Filament Medoid Investigation
 
-**Date**: 2026-06-03
-**Status**: INSTRUMENT BUILT + first real-catalog run (Stage 1, 15,421 Tempel filaments).
-First result is a clean **negative** on the mass-only test; emission test (Stage 2) is next.
+**Date**: 2026-06-04
+**Status**: NATIVE relational program built and run on real data. Four distinct native
+encodings tested — **all non-detections** (no Farey/RatioSpace signal beyond random).
 **Code**: [`aramis_filament_pipeline/`](aramis_filament_pipeline/)
+
+## Native relational results (the real test)
+
+After correcting the early linear contamination (means, Euclidean distance, projection),
+the test was rebuilt to be strictly native: relationships not positions, connectivity taken
+from the observed catalogue (never Euclidean proximity), exact-ratio encodings, only
+composition `⊗` / mediant `⊕` / continued-fraction tension, and a relational rewiring null
+(`aramis/web/`, guarded by a test that bans linear code). Run on the Tempel DR8 catalogue
+(12,495 filaments, ~1.8M continued-fraction partial quotients):
+
+| Test | native quantity | result | verdict |
+|---|---|---|---|
+| Position barcode | galaxy axis-position CF address | φ-coh 0.600 vs 0.596 uniform; no wall deficit | non-detection |
+| Stage A | redshift difference-ratios `\|Δz_k\|:\|Δz_{k+1}\|` | φ-coh **0.5784** vs **0.5820** shuffled | refuted (real *more* complex) |
+| Stage B | luminosity ratios `L_i:L_j` | φ-coh **0.5779** vs **0.5773** shuffled | non-detection |
+| Stage C | Farey adjacency `\|ad−bc\|=1` of relation sequence | det=1 **0.046** vs **0.046** shuffled | non-detection |
+
+**Honest conclusion so far:** across four framework-faithful native encodings, the Tempel
+cosmic-web relations are statistically indistinguishable from generic reals (Gauss–Kuzmin
+neighborhood) and from a relational-rewiring null. The hypothesis that the web's connected
+nodes sit at low-tension Farey/Stern-Brocot relationships is **not supported by this data
+under these encodings**. This is a falsifiable negative, not a proof of absence: it does not
+rule out a different relational quantity (Stage D alignment is not yet run), but the
+position, redshift, luminosity, and Farey-adjacency channels show nothing.
+
+---
+
+### Earlier (superseded) Stage-1 mass-only run
 
 ---
 
